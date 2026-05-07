@@ -11,6 +11,7 @@ class Inventory extends JFrame implements ActionListener
 	
 	Connection con;
         Statement stmt;
+        PreparedStatement pstmt;
         ResultSet rs;
 	LayoutManager lm = null;
 	
@@ -159,14 +160,25 @@ class Inventory extends JFrame implements ActionListener
                 String sstone_number = stone_number.getText();
        	        String sdetails = details.getText();
 
-	 	String query =" INSERT INTO Inventory(Style_ID,Vendor_ID,In_Date,Gold,Gold_wt,Stone_Type,Stone_Weight,Stone_numbers,Details) VALUES ('"+sstyle_id+"','"+sVendor_id+"','"+sin_date+"','"+sgold_cr+"','"+sgold_wt+"','"+sstone_type+"','"+sstone_wt+"','"+sstone_number+"','"+sdetails+"')";
+	 	// Use parameterized query to prevent SQL injection
+		String query = "INSERT INTO Inventory(Style_ID,Vendor_ID,In_Date,Gold,Gold_wt,Stone_Type,Stone_Weight,Stone_numbers,Details) VALUES (?,?,?,?,?,?,?,?,?)";
                 //System.out.println("Query ="+query);
 		try
 	        {
         		Class.forName("sun.jdbc.odbc.JdbcOdbcDriver");
 		        con = DriverManager.getConnection("jdbc:odbc:JMS");
-			stmt = con.createStatement();
-			int result = stmt.executeUpdate ( query );
+			pstmt = con.prepareStatement(query);
+			// Set parameters using PreparedStatement to prevent SQL injection
+			pstmt.setString(1, sstyle_id);
+			pstmt.setString(2, sVendor_id);
+			pstmt.setString(3, sin_date);
+			pstmt.setString(4, sgold_cr);
+			pstmt.setString(5, sgold_wt);
+			pstmt.setString(6, sstone_type);
+			pstmt.setString(7, sstone_wt);
+			pstmt.setString(8, sstone_number);
+			pstmt.setString(9, sdetails);
+			int result = pstmt.executeUpdate();
 		}
 		catch(Exception ae)
               	{
